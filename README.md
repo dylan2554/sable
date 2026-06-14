@@ -1,7 +1,7 @@
 # Sable
 
 A UCI chess engine written from scratch in C++, with a **self-trained NNUE evaluation**.
-Estimated strength: **~3200 Elo** (see [Strength](#strength)).
+Estimated strength: **~3200 CCRL (single-threaded, estimated)** — see [Strength](#strength).
 
 Sable was built and trained on a single desktop PC (Intel i7-11700K + RTX 3070) — the
 neural network's training data was generated entirely by the engine playing itself,
@@ -76,21 +76,27 @@ A build without `-mavx2` also works (slower NNUE inference) for older CPUs.
 
 ## Strength
 
-Sable scored **45% in a 100-game match against Stockfish limited to UCI_Elo 3000**
-(time control 3s + 0.05s, 8 threads), for an estimated **~2965 Elo** at that setting.
+**Estimated ~3200 CCRL Blitz, single-threaded.**
 
-| Opponent (Stockfish UCI_Elo) | Result (Sable) | Games |
-|------------------------------|----------------|-------|
-| 1600 | 99% | 100 |
-| 2200 | 94% | 100 |
-| 2600 | 70% | 100 |
-| 2800 | 52% | 100 |
-| 3000 | 45% | 100 |
+This was measured by triangulating against engines with published CCRL Blitz ratings,
+under fair conditions: **single thread for both sides, equal 128 MB hash, 2'+1" time
+control** (CCRL Blitz), ponder off. The estimate is consistent across four independent
+anchors.
 
-Strength is estimated from the match score against opponents of known rating. Note that
-published engine-list ratings (e.g. CCRL) are measured single-threaded on normalized
-hardware, so a directly-comparable single-thread figure would be somewhat lower; these
-numbers reflect 8-thread play at fast time control.
+| Opponent (CCRL Blitz) | Sable score | Games | Implied Sable Elo |
+|-----------------------|-------------|-------|-------------------|
+| Inanis 1.6.0 (~3000)  | 70%         | 100   | ~3150 |
+| Stash v27 (~3057)     | ~76%        | 180   | ~3260 |
+| Stash v30 (~3166)     | ~54%        | 180   | ~3195 |
+| Stash v32 (~3252)     | ~43%        | 180   | ~3200 |
+
+The anchors agree within their error bars, centering on **~3200 CCRL single-threaded**.
+With multiple threads (Lazy SMP) Sable is stronger still; these numbers are the
+single-thread figure for comparability with CCRL's testing conditions.
+
+> Note: this is a self-estimate, not an official CCRL listing. The method follows the
+> community-standard approach of testing against Stash versions of known rating
+> (see the [engine testing guide](https://dannyhammer.github.io/engine-testing-guide/)).
 
 ## Training your own network
 
@@ -109,7 +115,7 @@ at every step. The neural network was trained from zero on self-play games gener
 my own PC — no external data and no pretrained weights.
 
 I'm releasing it to show what one person and a current AI model can build together in a
-few days: a chess engine going from non-existent to ~2965 Elo in under a week.
+few days: a chess engine going from non-existent to ~3200 CCRL (estimated) in under a week.
 
 ## License
 
